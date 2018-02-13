@@ -9,15 +9,39 @@
      for i from 0 below 19 do
        (format t
 	       "~a~%" line)))
+
+
 (ql:quickload
  '(:drakma :split-sequence :cl-ppcre-unicode :cl-ppcre :babel :montezuma))
 
 (defparameter *url*
   "(\\w+://[-\\w\\./_?=%&]+)")
-
+;http://www.the-art-of-web.com/php/parse-links/ 
+(defparameter *ref* "<a href=\"([^\"]*)\">(.*)<\/a>" )
+(cl-ppcre:all-matches-as-strings
+  "<a href=\"([^\"]*)\">(.*)<\/a>"  "<a href=\"hallo1\"></a>")
+; normal
+"<a href=\"hallo1\"></a>"
+; upcase
+"<a HREF=\"hallo1\"></a>"
+; extra attribs
+"<a src=\"bla\" href=\"hallo2\"></a>"
+"<a href=\"hallo3\" src=\"bla\"></a>"
+; no quotes
+"<a href=hallo4></a>"
+"<a src=\"bla\" href=hallo5></a>"
+"<a href=hallo6 src=\"bla\"></a>"
+; single quotes
+"<a href='hallo7'></a>"
+"<a src=\"bla\" href='hallo8'></a>"
+"<a href='hallo9' src=\"bla\"></a>"
+					; extra spaces
+"<a href = 'halloa'</a>"
+"<a src = \"bla\" href = hallob></a>"
+"<a href = 'halloc' src = \"bla\"></a>"
 (defun http-p (url)
   (cl-ppcre:all-matches
-   "\\bhttp://" url))
+   "\\bhttps?://" url))
 
 (defun known-binary-p (url)
   (let ((b
